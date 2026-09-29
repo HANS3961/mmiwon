@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>민원서비스 찾기</title>
+  <style>
+    :root { --navy:#142b43; --ink:#1e3040; --muted:#647483; --teal:#087f78; --teal-soft:#e8f5f2; --line:#dce4e9; --paper:#f5f7f7; --white:#fff; --shadow:0 14px 38px rgba(18,42,60,.07); }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:var(--ink); background:var(--paper); }
+    button,input,select { font:inherit; }
+    button { cursor:pointer; }
+    .topbar { height:66px; background:var(--navy); color:#fff; }
+    .top-inner { max-width:1160px; height:100%; margin:auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
+    .brand { display:flex; align-items:center; gap:11px; font-size:16px; font-weight:800; letter-spacing:-.04em; }
+    .brand-mark { width:33px;height:33px;border-radius:9px;background:#d2ebe5;color:#075e5a;display:grid;place-items:center;font-size:20px;font-weight:900; }
+    .top-caption { font-size:12px; color:#c0d0da; letter-spacing:.02em; }
+    .hero { background:linear-gradient(115deg,#18364e 0%,#174b57 67%,#0d6665 100%); color:white; }
+    .hero-inner { max-width:1160px; margin:auto; padding:46px 24px 54px; }
+    .eyebrow { margin:0 0 13px; color:#a6e2d8; font-size:12px; font-weight:800; letter-spacing:.16em; }
+    h1 { margin:0; font-size:clamp(29px,4vw,42px); letter-spacing:-.065em; line-height:1.28; }
+    .hero p:last-child { margin:14px 0 0; color:#d7e5e8; font-size:15px; line-height:1.7; }
+    main { max-width:1160px; margin:-25px auto 60px; padding:0 24px; position:relative; }
+    .search-panel { background:var(--white); border:1px solid #e5ebee; border-radius:17px; box-shadow:var(--shadow); padding:22px; }
+    .search-label { display:block; font-size:13px; font-weight:800; margin:0 0 9px; }
+    .search-wrap { position:relative; }
+    .search-icon { position:absolute; width:19px;height:19px;left:16px;top:50%;transform:translateY(-50%);color:#657886;pointer-events:none; }
+    #query { display:block;width:100%;height:50px;padding:0 18px 0 46px;border:1px solid #cbd8dd;border-radius:10px;background:#fff;color:var(--ink);outline:none; }
+    #query:focus,select:focus,button:focus-visible { outline:3px solid #9fdfd5; outline-offset:2px; }
+    #query::placeholder { color:#8a9aa5; }
+    .filters { display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;align-items:end;gap:12px;margin-top:17px; }
+    .control label { display:block;color:#526777;font-size:12px;font-weight:700;margin:0 0 7px; }
+    select { width:100%;height:42px;padding:0 30px 0 12px;border:1px solid #cbd8dd;border-radius:9px;background:#fff;color:var(--ink); }
+    #reset { height:42px;padding:0 16px;border:1px solid #bdd0d4;border-radius:9px;background:#f8fbfa;color:#205b5c;font-weight:800;white-space:nowrap; }
+    #reset:hover { background:#e9f5f2; }
+    .results-head { display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:35px 2px 14px; }
+    .results-head h2 { margin:0;font-size:21px;letter-spacing:-.045em; }
+    .results-head p { margin:5px 0 0;color:var(--muted);font-size:13px; }
+    .count { color:var(--teal); }
+    .data-card { background:#fff;border:1px solid #e0e7ea;border-radius:15px;box-shadow:0 5px 22px rgba(20,43,67,.035);overflow:hidden; }
+    table { width:100%;border-collapse:collapse;table-layout:fixed; }
+    thead { background:#eef3f5; }
+    th { padding:16px 17px;color:#526676;text-align:left;font-size:12px;font-weight:800;white-space:nowrap; }
+    td { padding:18px 17px;border-top:1px solid #e9eef0;font-size:13px;vertical-align:middle; }
+    tbody tr:hover { background:#f9fcfb; }
+    .service-name { display:block;font-size:14px;font-weight:800;letter-spacing:-.025em;line-height:1.4; }
+    .service-id { display:block;margin-top:5px;font-size:11px;color:#81909a;font-weight:600; }
+    .category { display:inline-block;padding:6px 9px;border-radius:7px;background:#f0f3f5;color:#445d6d;font-size:12px;font-weight:700; }
+    .yes,.no { display:inline-flex;align-items:center;gap:6px;font-weight:700;white-space:nowrap; }
+    .yes { color:#08776c; }.no { color:#76838d; }
+    .dot { width:7px;height:7px;border-radius:100%;background:currentColor;display:inline-block; }
+    .number { font-variant-numeric:tabular-nums;white-space:nowrap; }
+    .empty { display:none;text-align:center;padding:60px 20px; }
+    .empty strong { font-size:17px; }.empty p { margin:10px 0 22px;color:var(--muted);font-size:13px; }
+    .empty button { border:0;background:var(--teal);color:white;border-radius:9px;padding:10px 17px;font-weight:700; }
+    .note { margin:18px 3px 0;color:#738390;font-size:12px;line-height:1.7; }
+    @media (max-width:850px) { .filters{grid-template-columns:repeat(2,minmax(0,1fr));}.filters #reset{grid-column:1/-1;} th,td{padding:15px 11px;} }
+    @media (max-width:640px) { .top-caption{display:none}.hero-inner{padding:37px 20px 55px}main{padding:0 15px;margin-top:-22px}.search-panel{padding:17px}.filters{gap:11px}.results-head{margin-top:27px}.data-card{background:transparent;border:0;box-shadow:none;overflow:visible}table,tbody{display:block}thead{display:none}tr{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:17px;margin-bottom:11px;border:1px solid #e1e9ec;border-radius:13px;background:white;box-shadow:0 4px 16px rgba(20,43,67,.035)}tbody tr:hover{background:white}td{display:block;border:0;padding:0;font-size:12px}td:first-child{grid-column:1/-1;padding-bottom:12px;border-bottom:1px solid #edf1f2}.service-name{font-size:15px}.service-id{margin-top:3px}td::before{display:block;margin:0 0 4px;color:#83929d;font-size:11px;font-weight:700}td:nth-child(2)::before{content:'민원분야'}td:nth-child(3)::before{content:'소관기관'}td:nth-child(4)::before{content:'온라인 처리'}td:nth-child(5)::before{content:'처리기한'}td:nth-child(6)::before{content:'수수료'}.note{margin-top:8px} }
+    @media (max-width:380px) { .filters{grid-template-columns:1fr}.filters #reset{grid-column:auto} }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="top-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">민</span><span>민원서비스 안내</span></div><span class="top-caption">필요한 서비스를 한눈에</span></div></header>
+  <section class="hero"><div class="hero-inner"><p class="eyebrow">SERVICE DIRECTORY</p><h1>찾으시는 민원서비스를<br>빠르게 확인하세요</h1><p>서비스명으로 검색하고, 분야와 처리 방법에 맞춰 살펴보세요.</p></div></section>
+  <main>
+    <section class="search-panel" aria-label="민원서비스 검색 및 필터">
+      <label class="search-label" for="query">서비스 검색</label>
+      <div class="search-wrap"><svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 5 5"></path></svg><input id="query" type="search" placeholder="서비스명, 소관기관 또는 서비스 ID 검색" autocomplete="off"></div>
+      <div class="filters">
+        <div class="control"><label for="category">민원분야</label><select id="category"><option value="">전체 분야</option></select></div>
+        <div class="control"><label for="online">온라인 처리</label><select id="online"><option value="">전체</option><option value="가능">가능</option><option value="불가">불가</option></select></div>
+        <div class="control"><label for="fee">수수료</label><select id="fee"><option value="">전체</option><option value="free">무료</option><option value="paid">유료</option></select></div>
+        <div class="control"><label for="sort">정렬</label><select id="sort"><option value="id">기본 순서</option><option value="name">서비스명 가나다순</option><option value="days">처리기한 짧은 순</option><option value="fee">수수료 낮은 순</option></select></div>
+        <button type="button" id="reset">초기화</button>
+      </div>
+    </section>
+    <div class="results-head"><div><h2>민원서비스 목록 <span class="count" id="count">22</span></h2><p id="status" role="status" aria-live="polite">전체 22건을 표시하고 있습니다.</p></div></div>
+    <div class="data-card"><table><colgroup><col style="width:26%"><col style="width:12%"><col style="width:20%"><col style="width:15%"><col style="width:13%"><col style="width:14%"></colgroup><thead><tr><th scope="col">서비스명</th><th scope="col">민원분야</th><th scope="col">소관기관</th><th scope="col">온라인 처리</th><th scope="col">처리기한</th><th scope="col">수수료</th></tr></thead><tbody id="results"></tbody></table><div class="empty" id="empty"><strong>검색 결과가 없습니다</strong><p>검색어나 필터 조건을 바꿔 다시 확인해 주세요.</p><button type="button" id="empty-reset">조건 초기화</button></div></div>
+    <p class="note">자료: 첨부된 민원서비스_목록.json. 처리기한 0일은 원본 값을 그대로 표시합니다. 신청 전 실제 담당기관의 최신 안내를 확인하세요.</p>
+  </main>
+  <script id="service-data" type="application/json">[{"서비스ID": "S001", "서비스명": "주민등록등본 발급", "소관기관": "주민센터", "민원분야": "주민등록", "온라인처리": "가능", "처리기한일": 7, "수수료": 500}, {"서비스ID": "S002", "서비스명": "전입신고", "소관기관": "복지정책과", "민원분야": "주민등록", "온라인처리": "불가", "처리기한일": 1, "수수료": 0}, {"서비스ID": "S003", "서비스명": "인감증명 발급", "소관기관": "복지정책과", "민원분야": "주민등록", "온라인처리": "가능", "처리기한일": 1, "수수료": 0}, {"서비스ID": "S004", "서비스명": "주민등록증 재발급", "소관기관": "건축과", "민원분야": "주민등록", "온라인처리": "가능", "처리기한일": 0, "수수료": 0}, {"서비스ID": "S005", "서비스명": "건축물대장 발급", "소관기관": "구청 민원봉사과", "민원분야": "건축", "온라인처리": "불가", "처리기한일": 0, "수수료": 1000}, {"서비스ID": "S006", "서비스명": "건축허가 신청", "소관기관": "건축과", "민원분야": "건축", "온라인처리": "불가", "처리기한일": 1, "수수료": 2000}, {"서비스ID": "S007", "서비스명": "용도변경 신고", "소관기관": "시청 민원과", "민원분야": "건축", "온라인처리": "불가", "처리기한일": 0, "수수료": 0}, {"서비스ID": "S008", "서비스명": "지방세 납부확인서", "소관기관": "건축과", "민원분야": "세무", "온라인처리": "가능", "처리기한일": 1, "수수료": 1000}, {"서비스ID": "S009", "서비스명": "취득세 신고", "소관기관": "교통행정과", "민원분야": "세무", "온라인처리": "가능", "처리기한일": 0, "수수료": 0}, {"서비스ID": "S010", "서비스명": "재산세 조회", "소관기관": "교통행정과", "민원분야": "세무", "온라인처리": "가능", "처리기한일": 3, "수수료": 0}, {"서비스ID": "S011", "서비스명": "기초연금 신청", "소관기관": "건축과", "민원분야": "복지", "온라인처리": "가능", "처리기한일": 7, "수수료": 500}, {"서비스ID": "S012", "서비스명": "복지급여 조회", "소관기관": "시청 민원과", "민원분야": "복지", "온라인처리": "가능", "처리기한일": 14, "수수료": 5000}, {"서비스ID": "S013", "서비스명": "장애인 등록", "소관기관": "주민센터", "민원분야": "복지", "온라인처리": "가능", "처리기한일": 5, "수수료": 0}, {"서비스ID": "S014", "서비스명": "자동차 등록", "소관기관": "주민센터", "민원분야": "교통", "온라인처리": "가능", "처리기한일": 1, "수수료": 5000}, {"서비스ID": "S015", "서비스명": "운전면허 갱신", "소관기관": "교통행정과", "민원분야": "교통", "온라인처리": "불가", "처리기한일": 1, "수수료": 0}, {"서비스ID": "S016", "서비스명": "주정차 위반 조회", "소관기관": "주민센터", "민원분야": "교통", "온라인처리": "가능", "처리기한일": 7, "수수료": 1000}, {"서비스ID": "S017", "서비스명": "배출시설 신고", "소관기관": "주민센터", "민원분야": "환경", "온라인처리": "가능", "처리기한일": 1, "수수료": 0}, {"서비스ID": "S018", "서비스명": "폐기물 처리 신청", "소관기관": "시청 민원과", "민원분야": "환경", "온라인처리": "가능", "처리기한일": 14, "수수료": 5000}, {"서비스ID": "S019", "서비스명": "식품영업 신고", "소관기관": "건축과", "민원분야": "위생", "온라인처리": "가능", "처리기한일": 3, "수수료": 2000}, {"서비스ID": "S020", "서비스명": "위생업소 조회", "소관기관": "시청 민원과", "민원분야": "위생", "온라인처리": "불가", "처리기한일": 7, "수수료": 500}, {"서비스ID": "S021", "서비스명": "여권 발급 신청", "소관기관": "건축과", "민원분야": "여권", "온라인처리": "가능", "처리기한일": 7, "수수료": 1000}, {"서비스ID": "S022", "서비스명": "여권 재발급", "소관기관": "교통행정과", "민원분야": "여권", "온라인처리": "가능", "처리기한일": 1, "수수료": 1000}]</script>
+  <script>
+    const services = JSON.parse(document.getElementById('service-data').textContent);
+    const byId = id => document.getElementById(id);
+    const state = ['query','category','online','fee','sort'].map(byId);
+    const total = services.length;
+    const collator = new Intl.Collator('ko');
+    [...new Set(services.map(item => item['민원분야']))].sort(collator.compare).forEach(value => {
+      const option = document.createElement('option'); option.value = value; option.textContent = value; byId('category').append(option);
+    });
+    function td(text, className='') { const cell=document.createElement('td'); cell.textContent=text; if(className)cell.className=className; return cell; }
+    function render() {
+      const query=byId('query').value.trim().toLocaleLowerCase('ko');
+      const category=byId('category').value, online=byId('online').value, fee=byId('fee').value, sort=byId('sort').value;
+      const list=services.filter(item => {
+        const match=!query || ['서비스명','소관기관','서비스ID','민원분야'].some(key => String(item[key]).toLocaleLowerCase('ko').includes(query));
+        return match && (!category||item['민원분야']===category) && (!online||item['온라인처리']===online) && (!fee||(fee==='free'?item['수수료']===0:item['수수료']>0));
+      });
+      if(sort==='name')list.sort((a,b)=>collator.compare(a['서비스명'],b['서비스명']));
+      if(sort==='days')list.sort((a,b)=>a['처리기한일']-b['처리기한일']||collator.compare(a['서비스명'],b['서비스명']));
+      if(sort==='fee')list.sort((a,b)=>a['수수료']-b['수수료']||collator.compare(a['서비스명'],b['서비스명']));
+      const body=byId('results');body.replaceChildren();
+      const fragment=document.createDocumentFragment();
+      list.forEach(item => {
+        const row=document.createElement('tr');
+        const name=td('');const strong=document.createElement('span');strong.className='service-name';strong.textContent=item['서비스명'];const id=document.createElement('span');id.className='service-id';id.textContent=item['서비스ID'];name.append(strong,id);row.append(name);
+        const categoryCell=td('');const pill=document.createElement('span');pill.className='category';pill.textContent=item['민원분야'];categoryCell.append(pill);row.append(categoryCell);
+        row.append(td(item['소관기관']));
+        const onlineCell=td('');const flag=document.createElement('span');flag.className=item['온라인처리']==='가능'?'yes':'no';const dot=document.createElement('span');dot.className='dot';dot.setAttribute('aria-hidden','true');flag.append(dot,document.createTextNode(item['온라인처리']));onlineCell.append(flag);row.append(onlineCell);
+        row.append(td(item['처리기한일']+'일','number'));
+        row.append(td(item['수수료']===0?'무료':item['수수료'].toLocaleString('ko-KR')+'원','number'));
+        fragment.append(row);
+      });
+      body.append(fragment);
+      byId('count').textContent=list.length.toLocaleString('ko-KR');
+      byId('status').textContent=list.length===total?'전체 '+total+'건을 표시하고 있습니다.':'전체 '+total+'건 중 '+list.length+'건이 검색되었습니다.';
+      byId('empty').style.display=list.length?'none':'block';
+    }
+    function reset() { state.forEach(element=>element.value=element.id==='sort'?'id':'');render();byId('query').focus(); }
+    state.forEach(element=>element.addEventListener(element.id==='query'?'input':'change',render));
+    byId('reset').addEventListener('click',reset);byId('empty-reset').addEventListener('click',reset);
+    render();
+  </script>
+</body>
+</html>
